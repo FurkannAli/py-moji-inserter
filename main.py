@@ -1,7 +1,7 @@
 import sys, json
 from pathlib import Path
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QSizePolicy
-from PySide6.QtCore import Qt, QPoint
+from PySide6.QtCore import Qt, QPoint, QTimer
 from PySide6.QtGui import QCursor
 
 from window import Ui_Form
@@ -13,6 +13,8 @@ class EmojiInserter(QWidget):
         super().__init__()
         self.ui = Ui_Form()
         self.ui.setupUi(self)
+
+        self.is_pasting = False
 
         self.ui.scrollArea.setWidgetResizable(True)
         self.ui.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -101,14 +103,24 @@ class EmojiInserter(QWidget):
         self.populate_grid(filtered)
 
     def handle_selection(self, text: str):
+        self.is_pasting = True
         self.hide()
+        QTimer.singleShot(20, lambda: self._finish_paste(text))
+        #paste_character(text)
+        #QApplication.quit()
+
+    def _finish_paste(self, text: str):
         paste_character(text)
-        QApplication.quit()
+        self.show()
+        self.raise_()
+        self.activateWindow()
+        self.is_pasting = False
 
     def changeEvent(self, event):
         if event.type() == event.Type.ActivationChange and not self.isActiveWindow():
-            self.hide()
-            QApplication.quit()
+            if not self.is_pasting:
+                self.hide()
+                QApplication.quit()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
