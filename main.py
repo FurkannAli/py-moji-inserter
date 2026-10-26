@@ -105,7 +105,7 @@ class EmojiInserter(QWidget):
     def handle_selection(self, text: str):
         self.is_pasting = True
         self.hide()
-        QTimer.singleShot(20, lambda: self._finish_paste(text))
+        QTimer.singleShot(10, lambda: self._finish_paste(text))
         #paste_character(text)
         #QApplication.quit()
 
